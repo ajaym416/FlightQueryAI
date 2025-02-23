@@ -8,7 +8,7 @@ services:
     env_file:
       - .env
     ports:
-      - "5448:5432"
+      - "5432:5432"
     volumes:
       - ps_data:/var/lib/postgresql/data
     healthcheck:
@@ -22,11 +22,13 @@ services:
       context: ./src/api
       dockerfile: Dockerfile
     restart: always
-    command: uvicorn server:app --reload --workers 1 --host 0.0.0.0 --port 8000
+    command: ["/bin/sh", "-c", "alembic upgrade head && uvicorn server:app --reload --workers 1 --host 0.0.0.0 --port 8000"]
     networks:
       - backend
     ports:
       - "8010:8000"
+    volumes:
+      - ./src/api/:/api
     env_file:
       - .env
 
