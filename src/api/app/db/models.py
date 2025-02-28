@@ -8,6 +8,7 @@ class Airline(SQLModel, table=True):
 
     flights: List["Flight"] = Relationship(back_populates="airline")
 
+
 # Airports Table
 class Airport(SQLModel, table=True):
     iata_code: str = Field(primary_key=True, max_length=3)
@@ -18,21 +19,35 @@ class Airport(SQLModel, table=True):
     latitude: float
     longitude: float
 
-    origin_flights: List["Flight"] = Relationship(back_populates="origin_airport", sa_relationship_kwargs={"foreign_keys": "[Flight.origin_airport]"})
-    destination_flights: List["Flight"] = Relationship(back_populates="destination_airport", sa_relationship_kwargs={"foreign_keys": "[Flight.destination_airport]"})
+    # Specify which Flight column to use for the origin flights relationship
+    origin_flights: List["Flight"] = Relationship(
+        back_populates="origin_airport",
+        sa_relationship_kwargs={"foreign_keys": "[Flight.origin_airport_id]"}
+    )
+    # Specify which Flight column to use for the destination flights relationship
+    destination_flights: List["Flight"] = Relationship(
+        back_populates="destination_airport",
+        sa_relationship_kwargs={"foreign_keys": "[Flight.destination_airport_id]"}
+    )
 
-# Flights Table
+
+# Flights Table with renamed foreign key columns
 class Flight(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     year: int
     month: int
     day: int
     day_of_week: int
-    airline: str = Field(foreign_key="airline.iata_code")
+
+    # Foreign key column for Airline relationship
+    airline_id: str = Field(foreign_key="airline.iata_code")
     flight_number: str
     tail_number: Optional[str] = None
-    origin_airport: str = Field(foreign_key="airport.iata_code")
-    destination_airport: str = Field(foreign_key="airport.iata_code")
+
+    # Renamed foreign key columns for airports
+    origin_airport_id: str = Field(foreign_key="airport.iata_code")
+    destination_airport_id: str = Field(foreign_key="airport.iata_code")
+
     scheduled_departure: Optional[int] = None
     departure_time: Optional[int] = None
     departure_delay: Optional[int] = None
@@ -56,6 +71,15 @@ class Flight(SQLModel, table=True):
     late_aircraft_delay: Optional[int] = None
     weather_delay: Optional[int] = None
 
+    # Relationships
     airline: Airline = Relationship(back_populates="flights")
-    origin_airport: Airport = Relationship(back_populates="origin_flights")
-    destination_airport: Airport = Relationship(back_populates="destination_flights")
+    # Specify that the origin_airport relationship uses the origin_airport_id column
+    origin_airport: Airport = Relationship(
+        back_populates="origin_flights",
+        sa_relationship_kwargs={"foreign_keys": "[Flight.origin_airport_id]"}
+    )
+    # Specify that the destination_airport relationship uses the destination_airport_id column
+    destination_airport: Airport = Relationship(
+        back_populates="destination_flights",
+        sa_relationship_kwargs={"foreign_keys": "[Flight.destination_airport_id]"}
+    )
