@@ -12,5 +12,7 @@ POSTGRES_DB = config("POSTGRES_DB", cast=str, default="postgres")
 DATABASE_URL = config(
     "DATABASE_URL",
     cast=DatabaseURL,
-    default=f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@localhost:{POSTGRES_PORT}/{POSTGRES_DB}",
+    default=f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_SERVER}:{POSTGRES_PORT}/{POSTGRES_DB}",
 )
+
+GEMINI_API_KEY = config("GEMINI_API_KEY", cast=str, default="GEMINI_API_KEY")
