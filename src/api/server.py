@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.apis.default_api import router as DefaultApiRouter
@@ -18,3 +19,4 @@ app.add_middleware(
 )
 
 app.include_router(DefaultApiRouter)
+app.mount("/", StaticFiles(directory="frontend", html=True), name="static")

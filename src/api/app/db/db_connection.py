@@ -49,18 +49,18 @@ class DbConnection:
         return query  # Return sanitized query without pagination
 
     def execute_query(self, query_id, paginated_query, limit=None, offset=None):
-        # try:
-        with self.conn.cursor() as cursor:
-            cursor.execute(paginated_query, (limit, offset))
-            rows = cursor.fetchall()
-            columns = [desc[0] for desc in cursor.description]  # Get column names
+        try:
+            with self.conn.cursor() as cursor:
+                cursor.execute(paginated_query, (limit, offset))
+                rows = cursor.fetchall()
+                columns = [desc[0] for desc in cursor.description]  # Get column names
 
-        return {
-            "query_id": query_id,
-            "data": [dict(zip(columns, row)) for row in rows],
-            "limit": limit,
-            "offset": offset,
-        }
+            return {
+                "query_id": query_id,
+                "data": [dict(zip(columns, row)) for row in rows],
+                "limit": limit,
+                "offset": offset,
+            }
 
-        # except Exception as e:
-        #     return {"error": str(e)}
+        except Exception as e:
+            return {"error": str(e)}

@@ -15,7 +15,7 @@ query_cache: Dict[str, str] = {}
 llm_caller = LLMCaller()
 
 
-@router.post("/generate_query")
+@router.get("/generate_query")
 async def generate_and_store_query(
     input_text: str = Query(None, description="Ask me questions about the DB")
 ):
