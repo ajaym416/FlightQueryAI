@@ -32,7 +32,7 @@ class DbConnection:
         # Ensure the query is a SELECT statement
         if not query_lower.startswith("select"):
             raise HTTPException(
-                status_code=400, detail="Only SELECT queries are allowed"
+                status_code=400, detail="Only Questions that generate the Select queries are allowed :( Please refine your questions"
             )
 
         # Check for existing LIMIT clause
@@ -63,4 +63,4 @@ class DbConnection:
             }
 
         except Exception as e:
-            return {"error": str(e)}
+            return {"error" : f"Invalid SQL query. Please refine your question.--{str(e)}"}

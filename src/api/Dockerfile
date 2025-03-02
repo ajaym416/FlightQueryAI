@@ -7,4 +7,5 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-# RUN alembic upgrade head
+RUN alembic upgrade head
+RUN python3 ./populate_database.py

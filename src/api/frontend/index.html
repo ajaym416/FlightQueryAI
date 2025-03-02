@@ -1,51 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Natural Language Query</title>
     <script src="https://unpkg.com/htmx.org@1.9.2"></script>
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        .container { max-width: 600px; margin: auto; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f4f4f4; }
-        .side-note { background: #fffae6; padding: 10px; margin-top: 20px; border-left: 5px solid #ffcc00; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .error-message {
+            color: red;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            min-width: 600px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        .pagination-controls {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .pagination-controls button {
+            padding: 10px 15px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .pagination-controls button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .pagination-controls button:hover:not(:disabled) {
+            background-color: #0056b3;
+        }
+
+        .side-note {
+            background: #fffae6;
+            padding: 10px;
+            margin-top: 20px;
+            border-left: 5px solid #ffcc00;
+        }
     </style>
 </head>
+
 <body>
     <div class="container">
-        <h2>Ask a Database Query</h2>
-        <p>Enter your natural language query below to fetch data.</p>
-        
-        <form hx-get="/generate_query" hx-target="#query-result" hx-swap="innerHTML">
-            <input type="text" name="input_text" placeholder="e.g., Show all users from New York" required style="width: 100%; padding: 8px;">
-            <button type="submit" style="margin-top: 10px; padding: 8px 16px;">Generate Query</button>
-        </form>
-        
-        <div id="query-result"></div>
+        <img src="airplane.png" alt="Airplane" style="width: 200px; margin-bottom: 15px;">
+        <h2 style="color: #333; font-size: 24px; margin-bottom: 10px;">Ask a Question related to Flight & related Database!!</h2>
+        <p style="color: #666; font-size: 16px; margin-bottom: 20px;">
+            Enter your natural language query below to fetch data.
+        </p>
 
-        <div id="pagination-controls" style="margin-top: 20px; display: none;">
+        <form id="query-form" hx-get="/generate_query" hx-target="#query-result" hx-swap="innerHTML"
+            style="width: 100%; max-width: 900px; margin: auto; padding: 30px; border: 1px solid #ccc; border-radius: 12px; display: flex; flex-direction: column; gap: 15px;">
+            <input type="text" id="user-query" name="input_text" placeholder="e.g., Show all users from New York" required
+                style="width: 95%; padding: 15px; font-size: 18px; border: 1px solid #aaa; border-radius: 10px; outline: none;">
+            <p id="error-message" class="error-message">Invalid query. Please enter a relevant flight-related question.</p>
+            <div style="display: flex; justify-content: flex-end;">
+                <button type="submit" style="
+                    width: 30%;
+                    padding: 12px;
+                    font-size: 16px;
+                    border: none;
+                    border-radius: 8px;
+                    text-align: center;
+                    background-color: #535658;
+                    color: white;
+                    cursor: pointer;
+                    transition: background 0.3s;" 
+                    onmouseover="this.style.backgroundColor='#7f8183'"
+                    onmouseout="this.style.backgroundColor='#656a70'">
+                    Generate Query
+                </button>
+            </div>
+        </form>
+
+        <div class="table-container">
+            <div id="query-result"></div>
+        </div>
+
+        <div class="pagination-controls" id="pagination-controls">
             <button id="prev-btn" onclick="fetchPage(-1)" disabled>Previous</button>
             <button id="next-btn" onclick="fetchPage(1)">Next</button>
         </div>
-        
+
         <div class="side-note">
-            <strong>Note:</strong> Please enter only queries that <b>read</b> data from the database (e.g., "Show all users in New York").
+            <strong>Note:</strong> Please enter Questions that genereate queries that <b>read</b> data from the database (e.g., "List all flights departing from JFK airport in January 2015.").
             Queries that <b>modify</b> data (INSERT, UPDATE, DELETE) are not allowed.
         </div>
     </div>
-    
+
     <script>
         let queryId = null;
         let offset = 0;
         const limit = 10;
-        
+
+        document.getElementById("query-form").addEventListener("submit", function (event) {
+            const userQuery = document.getElementById("user-query").value.trim();
+            const errorMessage = document.getElementById("error-message");
+
+            if (userQuery.length === 0) {
+                event.preventDefault();
+                errorMessage.textContent = "Query cannot be empty.";
+                errorMessage.style.display = "block";
+            } else {
+                errorMessage.style.display = "none";
+            }
+        });
+
         function fetchPage(direction) {
             offset += direction * limit;
             if (offset < 0) offset = 0;
-            
+
             fetch(`/execute_query?query_id=${queryId}&limit=${limit}&offset=${offset}`)
                 .then(response => response.json())
                 .then(data => {
@@ -56,21 +170,23 @@
                     renderTable(data.data);
                     document.getElementById("prev-btn").disabled = offset === 0;
                     document.getElementById("next-btn").disabled = data.data.length < limit;
+                }).catch(error => {
+                    document.getElementById("query-result").innerHTML = `<p style='color: red;'>Error fetching data. Please try again.</p>`;
                 });
         }
-        
+
         function renderTable(rows) {
             if (rows.length === 0) {
                 document.getElementById("query-result").innerHTML = "<p>No data found.</p>";
                 return;
             }
-            
-            let table = `<table><thead><tr>`;
+
+            let table = `<div class="table-container"><table><thead><tr>`;
             Object.keys(rows[0]).forEach(col => {
                 table += `<th>${col}</th>`;
             });
             table += `</tr></thead><tbody>`;
-            
+
             rows.forEach(row => {
                 table += "<tr>";
                 Object.values(row).forEach(value => {
@@ -78,20 +194,32 @@
                 });
                 table += "</tr>";
             });
-            table += "</tbody></table>";
-            
+            table += "</tbody></table></div>";
+
             document.getElementById("query-result").innerHTML = table;
             document.getElementById("pagination-controls").style.display = "block";
         }
-        
-        document.body.addEventListener("htmx:afterSwap", function(event) {
-            if (event.detail.target.id === "query-result") {
+
+        document.body.addEventListener("htmx:afterSwap", function (event) {
+            try {
                 const responseData = JSON.parse(event.detail.xhr.responseText);
+                if (responseData.error) {
+                    document.getElementById("query-result").innerHTML = `<p style='color: red;'>${responseData.error}</p>`;
+                    return;
+                }
                 queryId = responseData.query_id;
                 offset = 0;
                 fetchPage(0);
+            } catch (error) {
+                document.getElementById("query-result").innerHTML = `<p style='color: red;'>Unexpected error occurred.</p>`;
             }
+        });
+
+        document.body.addEventListener("htmx:responseError", function (event) {
+            const errorMessage = event.detail.xhr.responseText;
+            document.getElementById("query-result").innerHTML = `<p style="color: red;">${errorMessage}</p>`;
         });
     </script>
 </body>
+
 </html>
