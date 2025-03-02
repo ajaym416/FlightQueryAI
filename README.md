@@ -3,7 +3,7 @@
 **FlightQueryAI** is a system designed to help generate SQL queries based on natural language input for querying airline datasets. The system allows users to input natural language questions, which are processed to generate corresponding SQL queries and fetch relevant data from a PostgreSQL database. The solution also provides a simple frontend powered by HTMX, where users can easily interact with the backend.
 
 ## Features
-- **Natural Language Processing (NLP)**: Converts natural language queries to SQL queries.
+- **Converts natural language queries to SQL queries.**
 - **Pagination**: Handles large datasets by using pagination in the results.
 - **Frontend**: Simple, interactive frontend using HTMX for real-time query generation and display.
 - **Dockerized**: Easily deployable using Docker Compose, which includes the necessary configuration for the backend and PostgreSQL database.
