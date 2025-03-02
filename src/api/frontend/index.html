@@ -101,7 +101,7 @@
 
         <form id="query-form" hx-get="/generate_query" hx-target="#query-result" hx-swap="innerHTML"
             style="width: 100%; max-width: 900px; margin: auto; padding: 30px; border: 1px solid #ccc; border-radius: 12px; display: flex; flex-direction: column; gap: 15px;">
-            <input type="text" id="user-query" name="input_text" placeholder="e.g., Show all users from New York" required
+            <input type="text" id="user-query" name="input_text" placeholder="e.g., List all flights departing from JFK airport in January 2015." required
                 style="width: 95%; padding: 15px; font-size: 18px; border: 1px solid #aaa; border-radius: 10px; outline: none;">
             <p id="error-message" class="error-message">Invalid query. Please enter a relevant flight-related question.</p>
             <div style="display: flex; justify-content: flex-end;">
@@ -118,7 +118,7 @@
                     transition: background 0.3s;" 
                     onmouseover="this.style.backgroundColor='#7f8183'"
                     onmouseout="this.style.backgroundColor='#656a70'">
-                    Generate Query
+                    Generate Results
                 </button>
             </div>
         </form>
