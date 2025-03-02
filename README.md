@@ -35,14 +35,13 @@ With Docker Compose, you can easily set up the backend and PostgreSQL database. 
 ```bash
 docker compose up --build
 ```
-Downloading and populating database might take some time.
 
 ### Step 4: Populate database
-
+Run the following command to populate database
 ```bash
-cd src/api
-python3 populate_database.py
+docker compose exec api python3 populate_database.py
 ```
+Downloading and populating database might take some time.
 
 ### Step 5: Interact with the Application
 This will start the FastAPI backend, PostgreSQL database, and other required services. The swagger docs will be available at http://localhost:8010/docs, and the frontend will be accessible at http://localhost:8010. Feel free to change the port in docker-compose
