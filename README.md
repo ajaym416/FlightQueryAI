@@ -20,7 +20,7 @@
 Clone this repository to your local machine:
 
 ```bash
-git clone https://github.com/yourusername/FlightQueryAI.git
+git clone https://github.com/ajaym416/FlightQueryAI.git
 cd FlightQueryAI
 ```
 ### Step 2: Set Up Environment Variables
