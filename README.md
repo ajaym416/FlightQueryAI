@@ -40,7 +40,6 @@ Downloading and populating database might take some time.
 ### Step 4: Populate database
 
 ```bash
-cd src/api
 python3 populate_database.py
 ```
 
