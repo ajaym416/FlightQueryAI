@@ -30,11 +30,27 @@ sys_instruct="""You are an expert SQL assistant specializing in PostgreSQL.
 					- tail_number (TEXT) - Aircraft tail number
 					- origin_airport_id (TEXT, FOREIGN KEY → airport.iata_code) - Departure airport
 					- destination_airport_id (TEXT, FOREIGN KEY → airport.iata_code) - Arrival airport
-					- scheduled_departure (INTEGER) - Scheduled departure time (HHMM format)
-					- departure_time (INTEGER) - Actual departure time (HHMM format)
-					- arrival_time (INTEGER) - Actual arrival time (HHMM format)
+					- scheduled_departure (INTEGER) - Scheduled departure time 
+					- departure_time (INTEGER) - Actual departure time 
+					- departure_delay (INTEGER) - Delay in arrival (minutes)
+					- taxi_out (INTEGER) - taxi out time
+					- scheduled_time (INTEGER)
+					- elapsed_time (INTEGER)
+					- air_time (INTEGER)
+					- distance (INTEGER)
+					- wheels_on (INTEGER)
+					- taxi_in (INTEGER)
+					- scheduled_arrival (INTEGER)
+					- arrival_time (INTEGER) - Actual arrival time
 					- arrival_delay (INTEGER) - Delay in arrival (minutes)
-					- distance (INTEGER) - Distance between airports (miles)
+					- diverted (INTEGER)
+					- cancelled (INTEGER)
+					- cancellation_reason (TEXT)
+					- air_system_delay (INTEGER)
+					- security_delay (INTEGER)
+					- airline_delay (INTEGER)
+					- late_aircraft_delay (INTEGER)
+					- weather_delay (INTEGER)
 
 					Given this schema, generate a PostgreSQL query for the natural language request by user.
 					Make sure the query is valid.
@@ -59,7 +75,9 @@ class LLMCaller():
                 system_instruction=sys_instruct,
                 max_output_tokens=500,
                 temperature = 0.2,
+                # Lower values reduce randomness and ensure deterministic output, which is crucial for SQL queries that must be syntactically and logically correct.
                 top_p=0.9,
+                # allows the model to generate complete, natural SQL queries while still prioritizing the most likely outputs
                 response_mime_type = "application/json",
                 response_schema=JsonOp)
         )

@@ -39,12 +39,10 @@ class DbConnection:
         if "limit" in query_lower:
             match = re.search(r"limit\s+(\d+)", query_lower)
             if match:
-                user_limit = int(match.group(1))
-                if user_limit > 5000:  # Enforce max limit
-                    query = re.sub(
-                        r"limit\s+\d+", f"LIMIT 5000", query, flags=re.IGNORECASE
+                query = re.sub(
+                        r"limit\s+\d+", f"", query, flags=re.IGNORECASE
                     )
-            return query  # Return query with existing LIMIT
+            return query  # Return query without LIMIT
 
         return query  # Return sanitized query without pagination
 
